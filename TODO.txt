@@ -1,0 +1,124 @@
+//---------------------
+// ofxCVC TODO:
+//---------------------
+
+(Aim to get into PF2.0 asap) - can run manually for now and get threading happening later.
+		
+Next: 
+
+Thread: check ofxTUIO, or ofxMostPixelsEver for some examples of writing to a datastructure on a thread?
+
+
+* Blobs to get a real state variable need to be updated manually everyframe (not just when blob data is recieved, as they usually are paused in ACC mode?
+
+* BlobList:
+	could periodically walk from tail, to "re" virgin ize anything dead, (save on large padding occuring, when you get a spurt of a lot of blobs?)
+
+[*starry] - String serlializing routines (for sending over mpe!)	
+	-getBlobPositionsStringSerialised to send
+	-updateBlobsFromCentroidRectStates to write.  We will default to use minimal blob states for brevity of data.
+	
+	- Perhaps shift update and draw to ofListeners? 
+	
+	- Socket is blocking when connection takes along time.
+		- Look at mimimising timeout of ofTCPClient?
+		- Chased down to ofxTCPManager::Connect so far...
+	
+	- Thread: (SocketReader is to be threaded)
+			
+			- add another socket back in to test though. as it could just be a load thing?
+			
+			- thread fault seems tied with debug-renderer.
+				- perhaps debug renderer, can host its own store of blobs, listening to event (to avoid the overwriting)  (as the destructors are)
+					- which gets updated via the listeners
+					- so the debug renderer would only listen and update it's table when its visible.
+					- when its disabled, it would dump the table
+					
+			- maybe abstract the blob store to a wrapper class? so both BlobMan and DebugRenderer can use it, 
+				- have generic, add(int, *blob) methods, and size(), clear() etc. + a copy()
+			
+			- threading, try the sample threading option i have seen 
+				-http://forum.openframeworks.cc/t/ofxtcpclient-is-it-threaded/13170/3
+
+				Great of thread safe vector post: http://forum.openframeworks.cc/t/simple-particles-system-and-thread/7248/7
+
+				http://stackoverflow.com/questions/8464458/c-pthread-how-to-make-map-access-threadsafe
+
+				- get writing to a blob store.
+					- threadsafe: could use lock and unlock. (standard mutex "mutually exclusive", one lock and unlock.)
+	
+	
+			- BUG: SMOOTHING! stops getting blobs final frames when they leave screen! As they are still being translated
+				Perhaps a mod that if SMOOTHING.
+					- keep updating blobs manually until they reach there final target val, so Blob class stores target val, and updates towards it in a loop when it is not updated?, these updates would not couunt towards the socket modification values (which determine when they are swept)
+					- so if smoothing, blobs move towards a target every frame (we loop through all blobs) and the VT updates just change the target values
+						** NOTE: will need to be done on Java Lib first as thats what video tracker uses, and could just do the smoothing there instead		
+		
+		- BlobList data structure wrapper.
+			
+		- outlines! using direct injection of socket buffer into blob for immediate parsing.
+		
+		- MultiServing
+		
+		- Overlap enabled
+		
+		- SocketReader: offset_rect
+		
+		- Manual mode - w visualisation
+		
+		- set up a VT with a matrix of inputs to link to.
+		
+		- look at CVCClientDev.java and try working up the tests
+				ManualBlobsTest etc
+		
+		- USE_QUEUED_UPDATES?	Not used in PF, so ignore for now, also might not be needed for 
+			
+	* Possible flow restructure
+		- socketreader has listener events for data, and send create, move & destroy to listeners
+		- therefore blob manager would be the thing that would listen to it.
+	
+
+------------------------------
+-- NOTES:
+------------------------------
+			
+	- go through java:cvc and rethink organisation?
+		- sketch out classes, leaving holes for things we don't initially need in starry, ie 
+	
+		Things not needed (initially):
+			#Multiple Sockets.
+			#Outlines
+			#Combining
+			#ManualMode
+			#Join intersected
+			#Visualisations (could just read the values from blobs manually, or use a listener)
+				- will need the update and remove methods, could just set these up as listeners for sure on CVC ::blobUpdate ::blobRemove
+		Low Priority
+			#Load from config.xml
+		
+		
+		BinSocket -> SocketReader ? contains start_entity, message parsing etc.
+		Client -> ofxTCPClient, already covers most of it??
+		SocketServer -> Socket? SocketConnection ?? Not really a server.
+
+SocketConnection (net.Connection) SocketClient or NetworkClient
+	SocketReader (net.Reader)
+
+OR  BinSocket and SocketServer get combined into [SocketReader].  Will help avoid possible fwd referencing issues etc, 
+
+Current Design
+
+	CVClient
+		- DebugRenderer
+		- ArrayList<SocketServer>
+			- BinSocket
+				- Client socket
+			- ServerConnector
+			
+		- BlobManager
+			- ConcurrentHashMap<Integer,Blob> _blob_table
+			- ArrayList<Integer> _destroyed_blobs
+			- ConcurrentHashMap<Integer,BlobUpdateEvent>
+			- BlobPool _blob_pool
+			
+	- start breaking out into cvc like classes, but simplify where needed. (no need to copy same strange as3 structure)
