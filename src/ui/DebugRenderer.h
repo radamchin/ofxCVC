@@ -1,4 +1,4 @@
-﻿/*
+/*
 	DebugRenderer
 	Draws all blobs outlines points etc,
 	
@@ -78,11 +78,15 @@ class DebugRenderer {
 	    void mouseDragged(ofMouseEventArgs & args);
         void mousePressed(ofMouseEventArgs & args);
         void mouseReleased(ofMouseEventArgs & args);
+    
+        void mouseScrolled(ofMouseEventArgs & args);
+        void mouseEntered(ofMouseEventArgs & args);
+        void mouseExited(ofMouseEventArgs & args);
 	
 	private:
         ofVec2f mouse_blob_scaler; // used to scale up or down mouse values on input
 		ofVec2f mouse_blob_offset; // used to shift the blob based on a translated view
-		int blob_colors[B_COLORS_LEN] = {0xFFFF0000, 0xFF00FFFF, 0xFF0000FF,0xFFFFFF00, 0xFFFF00FF, 0xFFFFAA00,0xFF9900FF, 0xFFCCCCCC}; // was 0x44 on all for alpha component
+		int blob_colors[B_COLORS_LEN] = {0xFF0000, 0x00FFFF, 0x0000FF,0xFFFF00, 0xFF00FF, 0xFFAA00,0x9900FF, 0xCCCCCC}; // was 0x44 on all for alpha component
     
 		int blobColor(int id = 0);
     

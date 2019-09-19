@@ -1,4 +1,4 @@
-﻿/*
+/*
 	DebugRenderer
 	Draws all blobs outlines points etc,
 	
@@ -267,6 +267,16 @@ void DebugRenderer::mousePressed(ofMouseEventArgs & args){
 void DebugRenderer::mouseReleased(ofMouseEventArgs & args){
 }
 
+void DebugRenderer::mouseScrolled(ofMouseEventArgs & args){
+}
+
+void DebugRenderer::mouseEntered(ofMouseEventArgs & args){
+}
+
+void DebugRenderer::mouseExited(ofMouseEventArgs & args){
+}
+
+//-------------------------------------------
 void DebugRenderer::mouseBlobPress() {
 	
 	if(ofGetElapsedTimeMillis() < mouse_blob_created_time + 100) return; // limit quick recreation issue due to event listening

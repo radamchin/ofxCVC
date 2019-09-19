@@ -4,7 +4,8 @@
  ofxTCPClientThreaded
  
  Adam Hinshaw 17/5/14
- Mod of ofxTCPClient so Connect  is threaded, and does not block entire  app for 75secs if machine / ip is not existant.
+ 
+ A mod. of ofxTCPClient so Connect is threaded, and does not block entire  app for 75secs if machine / ip is not existant.
  
  Notes: *Just connection is threaded, rest still runs on main host thread.
  
@@ -16,7 +17,7 @@
 #include "ofxTCPManager.h"
 #include "ofFileUtils.h"
 #include "ofTypes.h"
-
+#include "ofMain.h"
 #include "ofThread.h"
 
 #define TCP_MAX_MSG_SIZE 512
